@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maddy Prasad // Astrophysics & Computational Systems Portfolio</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            universe: {
+              black: '#040711',
+              dark: '#080d1a',
+              cardDark: 'rgba(13, 19, 36, 0.65)',
+              cardLight: 'rgba(255, 255, 255, 0.95)',
+              cyan: '#00f0ff',
+              neonPurple: '#a855f7',
+              neonPink: '#ec4899',
+              emerald: '#10b981',
+              borderDark: 'rgba(255, 255, 255, 0.1)',
+              borderLight: '#e2e8f0'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'monospace']
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float-slow': 'float 6s ease-in-out infinite',
+            'spin-slow': 'spin 18s linear infinite'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Universe Custom Grid Backgrounds */
+    .bg-grid-dark {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    }
+    .bg-grid-light {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    }
+    /* Glow utilities */
+    .glow-cyan {
+      box-shadow: 0 0 30px -4px rgba(0, 240, 255, 0.4);
+    }
+    .glow-purple {
+      box-shadow: 0 0 30px -4px rgba(168, 85, 247, 0.35);
+    }
+    .glow-pink {
+      box-shadow: 0 0 30px -4px rgba(236, 72, 153, 0.35);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-[#040711] dark:text-slate-100 font-sans antialiased selection:bg-universe-cyan selection:text-black transition-colors duration-300">
+
+  <!-- Fixed Ambient Glowing Orbs -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div id="orb-cyan" class="absolute -top-[15%] left-[10%] w-[540px] h-[540px] bg-universe-cyan/15 dark:bg-universe-cyan/15 rounded-full blur-[140px] animate-pulse-slow"></div>
+    <div id="orb-purple" class="absolute top-[30%] -right-[10%] w-[620px] h-[620px] bg-universe-neonPurple/20 dark:bg-universe-neonPurple/20 rounded-full blur-[160px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+    <div id="orb-pink" class="absolute bottom-[5%] left-[20%] w-[480px] h-[480px] bg-universe-neonPink/15 dark:bg-universe-neonPink/15 rounded-full blur-[150px]"></div>
+  </div>
+
+  <!-- Background Grid Container -->
+  <div id="bgGrid" class="fixed inset-0 pointer-events-none bg-grid-dark z-0 transition-opacity duration-500"></div>
+
+  <!-- Live Toast Notification Container -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xl backdrop-blur-xl border border-slate-200 dark:border-white/15">
+    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-500"></i>
+    <span id="toastMsg" class="text-sm font-medium">Notification message</span>
+  </div>
+
+  <!-- RESEARCH PAPER ABSTRACT & CITATION MODAL -->
+  <div id="paperModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div id="modalBox" class="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl bg-white dark:bg-[#0a0f1d] border border-slate-200 dark:border-universe-cyan/40 shadow-2xl shadow-cyan-500/10 overflow-hidden transform scale-95 transition-transform duration-300">
+      
+      <!-- Modal Top Ambient Glow -->
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-32 bg-universe-cyan/20 rounded-full blur-[70px] pointer-events-none"></div>
+
+      <!-- Modal Header -->
+      <div class="px-6 py-5 border-b border-slate-200 dark:border-white/10 flex items-start justify-between gap-4 relative z-10 bg-slate-50/70 dark:bg-white/[0.02]">
+        <div class="flex-1 pr-2">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span id="modalCategory" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium text-cyan-600 dark:text-universe-cyan bg-cyan-50 dark:bg-universe-cyan/10 border border-cyan-200 dark:border-universe-cyan/30">
+              CATEGORY
+            </span>
+            <span id="modalTarget" class="px-2.5 py-0.5 rounded-full text-[11px] font-mono text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30">
+              FACILITY / TARGET
+            </span>
+            <span id="modalPaperId" class="text-xs font-mono text-slate-500 dark:text-slate-400">id: ariastro</span>
+          </div>
+          <h3 id="modalTitle" class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+            Research Paper Title
+          </h3>
+          <p id="modalAuthors" class="text-xs sm:text-sm font-mono text-slate-600 dark:text-slate-300 mt-1.5 flex items-center gap-1.5">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-cyan-600 dark:text-universe-cyan"></i>
+            <span>Authors / Collaborators</span>
+          </p>
+        </div>
+        <button onclick="closePaperModal()" aria-label="Close modal" class="p-2 rounded-xl border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/30 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-white/5 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Scrollable Content -->
+      <div class="p-6 overflow-y-auto space-y-6 relative z-10 text-sm">
+        
+        <!-- Key Finding / Abstract -->
+        <div>
+          <div class="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-universe-cyan mb-2 font-bold">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Abstract & Synthesis
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 leading-relaxed text-slate-700 dark:text-slate-300 font-normal text-sm" id="modalAbstract">
+            Abstract content loads here dynamically.
+          </div>
+        </div>
+
+        <!-- Citation Generator Module -->
+        <div class="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-100/60 dark:bg-black/60 p-4">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div class="flex items-center gap-2 text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
+              <i data-lucide="quote" class="w-3.5 h-3.5 text-cyan-600 dark:text-universe-cyan"></i>
+              <span>CITE THIS ARTIFACT</span>
+            </div>
+
+            <!-- Tab Switcher (BibTeX / APA) -->
+            <div class="flex items-center gap-1 p-1 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono">
+              <button id="tabBibtex" onclick="switchCitationTab('bibtex')" class="px-2.5 py-1 rounded font-semibold bg-universe-cyan text-black transition-all">BibTeX</button>
+              <button id="tabApa" onclick="switchCitationTab('apa')" class="px-2.5 py-1 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">APA</button>
+            </div>
+          </div>
+
+          <!-- Citation Output Codeblock -->
+          <div class="relative">
+            <pre class="p-3.5 rounded-xl bg-white dark:bg-black/90 border border-slate-200 dark:border-white/10 font-mono text-xs text-slate-800 dark:text-slate-200 overflow-x-auto whitespace-pre leading-relaxed select-all" id="citationBox"></pre>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center justify-end gap-2 mt-3 pt-3 border-t border-slate-200 dark:border-white/10">
+            <button onclick="downloadBibtexFile()" class="px-3.5 py-1.5 rounded-xl text-xs font-mono text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/15 flex items-center gap-1.5 transition-all">
+              <i data-lucide="download" class="w-3.5 h-3.5 text-cyan-600 dark:text-universe-cyan"></i>
+              Download .bib
+            </button>
+            <button id="copyCitationBtn" onclick="copyActiveCitation()" class="px-4 py-1.5 rounded-xl text-xs font-mono font-semibold bg-universe-cyan text-black hover:bg-universe-cyan/90 flex items-center gap-1.5 transition-all active:scale-95">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Copy Citation</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/[0.02] flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Verified Research Milestone
+        </span>
+        <button onclick="closePaperModal()" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white underline">
+          Close (Esc)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NAVIGATION BAR -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-[#040711]/80 border-b border-slate-200 dark:border-white/10 transition-colors duration-300" id="mainHeader">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+      
+      <!-- Brand Logo / Badge -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-universe-cyan via-purple-600 to-universe-neonPink p-[1px] transition-transform duration-300 group-hover:scale-105">
+          <div class="w-full h-full bg-white dark:bg-[#090d16] rounded-xl flex items-center justify-center font-mono font-black text-sm tracking-tighter text-slate-900 dark:text-white">
+            MP<span class="text-cyan-600 dark:text-universe-cyan">.</span>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-bold text-sm tracking-wider font-mono uppercase text-slate-900 dark:bg-gradient-to-r dark:from-white dark:via-slate-200 dark:to-slate-400 dark:bg-clip-text dark:text-transparent group-hover:text-cyan-600 dark:group-hover:to-universe-cyan transition-all">
+            PORTFOLIO // 2026
+          </span>
+          <span class="text-[10px] text-slate-500 dark:text-slate-400 tracking-widest font-mono flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> ASTROPHYSICS & CODE
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-1 lg:gap-2">
+        <a href="#about" class="px-3.5 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">About</a>
+        <a href="#research" class="px-3.5 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">Research & Tools</a>
+        <a href="#stack" class="px-3.5 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">Stack</a>
+        <a href="#experience" class="px-3.5 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">Experience</a>
+        <a href="#terminal-section" class="px-3.5 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">Console</a>
+        <a href="#contact" class="px-3.5 py-1.5 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">Contact</a>
+      </nav>
+
+      <!-- Action Items & Theme Toggle -->
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggle" aria-label="Toggle Theme" class="p-2.5 rounded-xl border border-slate-200 dark:border-white/10 hover:border-universe-cyan/40 bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-universe-cyan transition-all duration-300 active:scale-95 shadow-sm">
+          <i data-lucide="sun" id="sunIcon" class="w-4 h-4 hidden"></i>
+          <i data-lucide="moon" id="moonIcon" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Resume / CV Button -->
+        <button onclick="copyEmailToClipboard()" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-mono font-semibold rounded-xl bg-slate-900 text-white dark:bg-gradient-to-r dark:from-universe-cyan/20 dark:to-purple-600/20 hover:bg-slate-800 dark:hover:from-universe-cyan/30 dark:hover:to-purple-600/30 dark:text-white border border-slate-800 dark:border-universe-cyan/40 dark:hover:border-universe-cyan transition-all glow-cyan active:scale-95">
+          <i data-lucide="file-text" class="w-3.5 h-3.5 text-universe-cyan"></i>
+          <span>Curriculum Vitae</span>
+        </button>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobileMenuBtn" aria-label="Toggle Mobile Menu" class="md:hidden p-2 rounded-lg border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+          <i data-lucide="menu" id="menuIcon" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Nav Dropdown -->
+    <div id="mobileMenu" class="hidden md:hidden border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#040711]/95 backdrop-blur-2xl px-6 py-4 space-y-2">
+      <a href="#about" class="block py-2 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-universe-cyan">About</a>
+      <a href="#research" class="block py-2 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-universe-cyan">Research & Tools</a>
+      <a href="#stack" class="block py-2 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-universe-cyan">Stack & Arsenal</a>
+      <a href="#experience" class="block py-2 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-universe-cyan">Experience</a>
+      <a href="#terminal-section" class="block py-2 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-universe-cyan">Live Console</a>
+      <a href="#contact" class="block py-2 text-sm text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-universe-cyan">Contact</a>
+      <div class="pt-3 border-t border-slate-200 dark:border-white/10">
+        <button onclick="copyEmailToClipboard()" class="w-full text-center py-2.5 rounded-lg bg-universe-cyan/20 text-cyan-600 dark:text-universe-cyan text-xs font-mono font-semibold border border-universe-cyan/40">
+          Get CV / Contact
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <main class="relative z-10">
+    <section id="about" class="relative pt-16 sm:pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      
+      <!-- Top Hologram Pill Badges -->
+      <div class="flex flex-wrap items-center gap-3 mb-8">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold tracking-wide bg-cyan-50 text-cyan-700 border border-cyan-200 dark:bg-universe-cyan/10 dark:border-universe-cyan/30 dark:text-universe-cyan backdrop-blur-md">
+          <span class="w-2 h-2 rounded-full bg-cyan-500 dark:bg-universe-cyan animate-ping"></span>
+          2026 RESEARCH & PORTFOLIO
+        </div>
+        <div class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 dark:text-emerald-400 dark:bg-emerald-500/10 dark:border-emerald-500/25 backdrop-blur-md">
+          <i data-lucide="radio" class="w-3.5 h-3.5"></i>
+          OPEN TO COLLABORATION & RESEARCH
+        </div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-medium text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-400 dark:bg-purple-500/10 dark:border-purple-500/25 backdrop-blur-md">
+          <i data-lucide="telescope" class="w-3.5 h-3.5"></i>
+          NIUS ASTRO FELLOW (HBCSE - TIFR)
+        </div>
+      </div>
+
+      <!-- Hero Main Heading -->
+      <div class="max-w-4xl">
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 text-slate-900 dark:text-white">
+          Bridging <span class="bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 dark:from-universe-cyan dark:via-purple-400 dark:to-universe-neonPink bg-clip-text text-transparent">Astrophysics</span>, 
+          Data Science & Computational Systems.
+        </h1>
+        <p class="text-lg sm:text-xl text-slate-700 dark:text-slate-300 font-light leading-relaxed mb-10 max-w-3xl">
+          Undergraduate researcher, astrophysicist, and systems programmer crafting high-throughput pipelines for 
+          <span class="text-slate-900 dark:text-white font-medium underline decoration-cyan-500 dark:decoration-universe-cyan/60 decoration-2 underline-offset-4">eruptive stellar photometry</span>, 
+          space telescope exposure calculators, and machine learning architectures.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap items-center gap-4">
+          <a href="#research" class="px-6 py-3.5 rounded-xl font-medium text-sm bg-gradient-to-r from-universe-cyan to-blue-600 hover:from-universe-cyan/90 hover:to-blue-500 text-black font-semibold flex items-center gap-2 shadow-lg shadow-cyan-500/25 transition-all duration-300 hover:scale-105 active:scale-95">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            Explore Featured Work
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 rounded-xl font-mono text-sm bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 dark:bg-slate-900/80 dark:hover:bg-slate-800 dark:text-slate-200 dark:border-white/15 dark:hover:border-white/30 flex items-center gap-2 backdrop-blur-md transition-all duration-300 hover:scale-105 shadow-sm">
+            <i data-lucide="github" class="w-4 h-4 text-cyan-600 dark:text-universe-cyan"></i>
+            GitHub Profile
+          </a>
+          <button onclick="copyEmailToClipboard()" class="px-5 py-3.5 rounded-xl font-mono text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 dark:border-white/10 flex items-center gap-2 transition-all">
+            <i data-lucide="mail" class="w-4 h-4"></i>
+            Quick Connect
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Floating Metrics & Status Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-16">
+        <!-- Metric 1 -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 backdrop-blur-md hover:border-cyan-500/40 dark:hover:border-universe-cyan/40 transition-all duration-300 group shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400 tracking-wider uppercase font-semibold">Focus Domain</span>
+            <i data-lucide="aperture" class="w-5 h-5 text-cyan-600 dark:text-universe-cyan group-hover:rotate-45 transition-transform duration-500"></i>
+          </div>
+          <div class="text-2xl font-bold font-mono text-slate-900 dark:text-white">NIR Photometry</div>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Decadal light curves & eruptive star tracking</p>
+        </div>
+
+        <!-- Metric 2 -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 backdrop-blur-md hover:border-purple-500/40 dark:hover:border-purple-500/40 transition-all duration-300 group shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400 tracking-wider uppercase font-semibold">Data Pipelines</span>
+            <i data-lucide="cpu" class="w-5 h-5 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform"></i>
+          </div>
+          <div class="text-2xl font-bold font-mono text-slate-900 dark:text-white">Astropy & NumPy</div>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Custom slope images & non-linearity calibrations</p>
+        </div>
+
+        <!-- Metric 3 -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 backdrop-blur-md hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-300 group shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400 tracking-wider uppercase font-semibold">Software Archetype</span>
+            <i data-lucide="code-2" class="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+          <div class="text-2xl font-bold font-mono text-slate-900 dark:text-white">CLI / GUI & APIs</div>
+          <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">macOS native clients, calculators & research tools</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: FEATURED WORK (RESTORED GITHUB UNIVERSE BENTO GRID) -->
+    <section id="research" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200 dark:border-white/10">
+      
+      <!-- Section Header with Category Filters -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono font-bold text-cyan-600 dark:text-universe-cyan mb-2">
+            <i data-lucide="layers" class="w-3.5 h-3.5"></i> FEATURED RESEARCH & ARTIFACTS
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+            Computational Systems & Astrophysics
+          </h2>
+        </div>
+
+        <!-- Interactive Category Switcher -->
+        <div class="flex flex-wrap gap-2 p-1.5 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-white/10 backdrop-blur-md text-xs font-mono" id="filterContainer">
+          <button onclick="filterProjects('all')" class="filter-btn active-filter px-3.5 py-1.5 rounded-lg bg-universe-cyan text-black font-semibold transition-all">All Work</button>
+          <button onclick="filterProjects('astro')" class="filter-btn px-3.5 py-1.5 rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/5 transition-all">Astrophysics</button>
+          <button onclick="filterProjects('software')" class="filter-btn px-3.5 py-1.5 rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/5 transition-all">Software & Tools</button>
+          <button onclick="filterProjects('ml')" class="filter-btn px-3.5 py-1.5 rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/5 transition-all">Algorithms & ML</button>
+        </div>
+      </div>
+
+      <!-- Bento Grid (Vibrant Neon Glow Dark Cards + Crisp Clean Light Cards) -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6" id="bentoContainer">
+
+        <!-- Bento Card 1: Large Spotlight (AriAstroTools) -->
+        <div class="project-card col-span-1 md:col-span-12 lg:col-span-8 group relative rounded-3xl p-8 bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-cyan-500/40 dark:hover:border-universe-cyan/60 backdrop-blur-xl shadow-sm dark:shadow-2xl transition-all duration-500 overflow-hidden" data-category="astro">
+          <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-universe-cyan/15 rounded-full blur-[100px] pointer-events-none group-hover:bg-universe-cyan/25 transition-all"></div>
+          
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full text-xs font-mono font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 dark:text-universe-cyan dark:bg-universe-cyan/10 dark:border-universe-cyan/30">
+              MAJOR RESEARCH PROJECT
+            </span>
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400">2024 — Present</span>
+          </div>
+
+          <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3 group-hover:text-cyan-600 dark:group-hover:text-universe-cyan transition-colors">
+            AriAstroTools & Near-Infrared Reduction Pipeline
+          </h3>
+          <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl font-normal">
+            Decadal near-infrared (J, H, K band) photometric analysis of eruptive Young Stellar Objects (FUors and EXors). Engineered an automated Python data reduction suite handling slope image calculations, non-linearity baseline calibration, aperture photometry, and variable star light-curve synthesis.
+          </p>
+
+          <div class="flex flex-wrap gap-2 mb-6">
+            <span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Python 3.12+</span>
+            <span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Astropy</span>
+            <span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Photutils</span>
+            <span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">NIR Photometry</span>
+            <span class="text-xs font-mono px-3 py-1 rounded-lg bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Slope Image Fitting</span>
+          </div>
+
+          <!-- Modal Trigger & Inspection Button -->
+          <div class="flex flex-wrap items-center gap-3 mb-6">
+            <button onclick="openPaperModal('ariastro')" class="px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-cyan-50 dark:bg-universe-cyan/20 hover:bg-cyan-100 dark:hover:bg-universe-cyan/30 text-cyan-700 dark:text-universe-cyan border border-cyan-200 dark:border-universe-cyan/40 flex items-center gap-2 transition-all">
+              <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Read Abstract & Cite
+            </button>
+            <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Command: <code class="text-cyan-600 dark:text-universe-cyan font-bold">cite ariastro</code></span>
+          </div>
+
+          <!-- Micro Code Snippet Preview -->
+          <div class="p-4 rounded-xl bg-slate-900 dark:bg-black/70 border border-slate-800 dark:border-white/10 font-mono text-xs text-slate-300">
+            <div class="flex items-center justify-between text-slate-400 pb-2 border-b border-white/10 mb-2">
+              <span class="flex items-center gap-1.5"><i data-lucide="terminal" class="w-3.5 h-3.5 text-universe-cyan"></i> slope_reducer.py</span>
+              <span class="text-[10px] text-emerald-400">Pipeline OK</span>
+            </div>
+            <code class="text-slate-400"># Linear regression slope extraction per pixel over non-destructive reads</code><br>
+            <code class="text-universe-cyan">slope_map</code> = np.einsum(<span class="text-purple-300">'ijk,i->jk'</span>, raw_frames, ramp_weights) / sum_sq
+          </div>
+        </div>
+
+        <!-- Bento Card 2: ExoETC Space Telescope Simulation -->
+        <div class="project-card col-span-1 md:col-span-6 lg:col-span-4 group relative rounded-3xl p-7 bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-purple-500/40 dark:hover:border-purple-500/60 backdrop-blur-xl shadow-sm dark:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden" data-category="astro">
+          <div class="absolute -right-10 -top-10 w-52 h-52 bg-universe-neonPurple/20 rounded-full blur-[90px] pointer-events-none group-hover:bg-universe-neonPurple/30 transition-all"></div>
+          
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold text-purple-700 bg-purple-50 border border-purple-200 dark:text-purple-300 dark:bg-purple-500/10 dark:border-purple-500/30">
+                SIMULATION & OPTICS
+              </span>
+              <i data-lucide="satellite" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors">
+              ExoETC (ExoPy) Exposure Time Calculator
+            </h3>
+            <p class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 font-normal">
+              Computational optical engine designed to estimate signal-to-noise ratios (SNR), stellar photon yields, and integration thresholds for space-borne exoplanet observation missions (ISRO ExoWorlds study).
+            </p>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap gap-1.5 mb-5">
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Photon Statistics</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">SciPy</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Atmosphere</span>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/10">
+              <button onclick="openPaperModal('exoetc')" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-cyan-600 dark:text-universe-cyan hover:underline">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Read Abstract & Cite
+              </button>
+              <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento Card 3: CosmicPaper Desktop Client -->
+        <div class="project-card col-span-1 md:col-span-6 lg:col-span-4 group relative rounded-3xl p-7 bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-emerald-500/40 dark:hover:border-emerald-500/60 backdrop-blur-xl shadow-sm dark:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden" data-category="software">
+          <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-emerald-500/15 rounded-full blur-[80px] pointer-events-none group-hover:bg-emerald-500/25 transition-all"></div>
+
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 dark:text-emerald-300 dark:bg-emerald-500/10 dark:border-emerald-500/30">
+                macOS DESKTOP APP
+              </span>
+              <i data-lucide="newspaper" class="w-5 h-5 text-emerald-600 dark:text-emerald-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
+              CosmicPaper // arXiv Desk Reader
+            </h3>
+            <p class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 font-normal">
+              Native desktop application built with Python & PyQt6 to ingest, rank, filter, and synthesize daily astrophysics preprints directly from the arXiv API with local caching and offline search.
+            </p>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap gap-1.5 mb-5">
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">PyQt6</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">arXiv API</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">SQLite3</span>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/10">
+              <button onclick="openPaperModal('cosmicpaper')" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-cyan-600 dark:text-universe-cyan hover:underline">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Read Abstract & Cite
+              </button>
+              <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento Card 4: CS-APRM Optimization Model -->
+        <div class="project-card col-span-1 md:col-span-6 lg:col-span-4 group relative rounded-3xl p-7 bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-cyan-500/40 dark:hover:border-universe-cyan/60 backdrop-blur-xl shadow-sm dark:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden" data-category="ml">
+          <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-universe-cyan/15 rounded-full blur-[80px] pointer-events-none group-hover:bg-universe-cyan/25 transition-all"></div>
+
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold text-cyan-700 bg-cyan-50 border border-cyan-200 dark:text-universe-cyan dark:bg-universe-cyan/10 dark:border-universe-cyan/30">
+                MACHINE LEARNING
+              </span>
+              <i data-lucide="brain-circuit" class="w-5 h-5 text-cyan-600 dark:text-universe-cyan"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-cyan-600 dark:group-hover:text-universe-cyan transition-colors">
+              CS-APRM Cold-Start Model
+            </h3>
+            <p class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 font-normal">
+              An Anti-Promotional Recommendation Model addressing the cold-start bottleneck in sparse high-dimensional data matrices via correlation penalty functions and content embedding vectors.
+            </p>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap gap-1.5 mb-5">
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">PyTorch</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Cosine Penalty</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Matrix Fact.</span>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/10">
+              <button onclick="openPaperModal('csaprm')" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-cyan-600 dark:text-universe-cyan hover:underline">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Read Abstract & Cite
+              </button>
+              <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bento Card 5: Radio Astronomy 21cm Kinematics -->
+        <div class="project-card col-span-1 md:col-span-6 lg:col-span-4 group relative rounded-3xl p-7 bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-pink-500/40 dark:hover:border-universe-neonPink/60 backdrop-blur-xl shadow-sm dark:shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden" data-category="astro">
+          <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-universe-neonPink/15 rounded-full blur-[80px] pointer-events-none group-hover:bg-universe-neonPink/25 transition-all"></div>
+
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold text-pink-700 bg-pink-50 border border-pink-200 dark:text-pink-400 dark:bg-pink-500/10 dark:border-pink-500/30">
+                RADIO ASTRONOMY
+              </span>
+              <i data-lucide="radio" class="w-5 h-5 text-pink-600 dark:text-pink-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-pink-600 dark:group-hover:text-pink-300 transition-colors">
+              Galactic Neutral Hydrogen (HI) 21cm
+            </h3>
+            <p class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-4 font-normal">
+              Analyzed spectroscopic data from the Gauribidanur and GMRT radio telescope arrays to map the Milky Way rotation curve and quantify dark matter velocity dispersion profiles.
+            </p>
+          </div>
+
+          <div>
+            <div class="flex flex-wrap gap-1.5 mb-5">
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">Fourier Transform</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">RRI Arrays</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-black/50 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300">21cm Doppler</span>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-white/10">
+              <button onclick="openPaperModal('hi21cm')" class="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-cyan-600 dark:text-universe-cyan hover:underline">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i> Read Abstract & Cite
+              </button>
+              <a href="#terminal-section" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                <i data-lucide="terminal" class="w-4 h-4"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION: EXPERIENCE & FELLOWSHIPS TIMELINE -->
+    <section id="experience" class="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-slate-200 dark:border-white/10">
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
+          <i data-lucide="award" class="w-3.5 h-3.5"></i> FELLOWSHIPS & MILESTONES
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+          Research Experience
+        </h2>
+      </div>
+
+      <div class="relative pl-6 sm:pl-10 border-l border-slate-300 dark:border-white/15 space-y-12">
+
+        <!-- Timeline 1 -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-white dark:bg-[#040711] border-2 border-cyan-500 dark:border-universe-cyan group-hover:scale-125 transition-transform glow-cyan"></div>
+          <div class="p-6 rounded-2xl bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-cyan-500/40 dark:hover:border-universe-cyan/50 backdrop-blur-md shadow-sm dark:shadow-xl transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-universe-cyan transition-colors">
+                NIUS Astronomy Fellow
+              </h3>
+              <span class="text-xs font-mono font-semibold text-cyan-600 dark:text-universe-cyan">Homi Bhabha Centre for Science Education (TIFR)</span>
+            </div>
+            <span class="inline-block text-xs font-mono text-slate-500 dark:text-slate-400 mb-4">Mumbai, India // 2024 — Present</span>
+            <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
+              Selected for the prestigious National Initiative on Undergraduate Science (NIUS) Astronomy fellowship. Conducting observational research on eruptive young stars, slope-image reduction routines, and multi-epoch infrared variability using national astronomical facilities.
+            </p>
+          </div>
+        </div>
+
+        <!-- Timeline 2 -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-white dark:bg-[#040711] border-2 border-purple-500 group-hover:scale-125 transition-transform glow-purple"></div>
+          <div class="p-6 rounded-2xl bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-purple-500/40 dark:hover:border-purple-500/50 backdrop-blur-md shadow-sm dark:shadow-xl transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                Radio Astronomy Research Intern
+              </h3>
+              <span class="text-xs font-mono font-semibold text-purple-600 dark:text-purple-400">Raman Research Institute / Gauribidanur</span>
+            </div>
+            <span class="inline-block text-xs font-mono text-slate-500 dark:text-slate-400 mb-4">Karnataka, India // 2023 — 2024</span>
+            <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
+              Processed raw radio interferometry datasets from the Gauribidanur Radio Observatory. Generated Doppler shift maps for neutral hydrogen (HI) 21cm spectral emission lines to model Milky Way rotation dynamics.
+            </p>
+          </div>
+        </div>
+
+        <!-- Timeline 3 -->
+        <div class="relative group">
+          <div class="absolute -left-[31px] sm:-left-[47px] top-1.5 w-4 h-4 rounded-full bg-white dark:bg-[#040711] border-2 border-emerald-500 group-hover:scale-125 transition-transform"></div>
+          <div class="p-6 rounded-2xl bg-white/95 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 hover:border-emerald-500/40 dark:hover:border-emerald-500/50 backdrop-blur-md shadow-sm dark:shadow-xl transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                Open-Source Maintainer & Developer
+              </h3>
+              <span class="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400">GitHub Community</span>
+            </div>
+            <span class="inline-block text-xs font-mono text-slate-500 dark:text-slate-400 mb-4">Global // 2023 — Present</span>
+            <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
+              Architecting modular, documented Python tools for students and researchers. Creating desktop utilities, mathematical solvers, and astronomical reduction scripts freely available to the computational community.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION: INTERACTIVE FAUX DEVELOPER CONSOLE -->
+    <section id="terminal-section" class="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-slate-200 dark:border-white/10">
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-bold text-cyan-600 dark:text-universe-cyan mb-2">
+          <i data-lucide="terminal" class="w-3.5 h-3.5"></i> CLI TERMINAL INTERACTION
+        </div>
+        <h2 class="text-3xl font-black text-slate-900 dark:text-white">Interactive Research Console</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mt-2">Type commands below or click quick shortcuts to inspect runtime research parameters.</p>
+      </div>
+
+      <!-- Terminal Window -->
+      <div class="rounded-2xl border border-slate-800 dark:border-white/15 bg-slate-950/90 dark:bg-black/85 backdrop-blur-2xl shadow-2xl overflow-hidden font-mono text-xs sm:text-sm">
+        <!-- Window title bar -->
+        <div class="px-4 py-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+            <span class="text-slate-400 text-xs ml-2 font-mono">maddy@universe-node: ~ (zsh)</span>
+          </div>
+          <div class="flex items-center gap-2 text-[11px] text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ONLINE
+          </div>
+        </div>
+
+        <!-- Terminal Output Area -->
+        <div id="terminalOutput" class="p-5 space-y-2 h-72 overflow-y-auto text-slate-300 leading-relaxed">
+          <div class="text-slate-400">Type <span class="text-universe-cyan">help</span> or click one of the preset prompts below.</div>
+          <div class="text-emerald-400 font-bold">✨ GitHub Universe 2026 Environment Initialized.</div>
+        </div>
+
+        <!-- Terminal Input Row -->
+        <form id="terminalForm" class="flex items-center gap-2 px-4 py-3 bg-white/[0.02] border-t border-white/10" onsubmit="handleTerminalSubmit(event)">
+          <span class="text-universe-cyan font-bold">&gt;</span>
+          <input 
+            type="text" 
+            id="terminalInput" 
+            placeholder="Type 'help', 'whoami', 'fetch_projects', 'stack'..." 
+            class="flex-1 bg-transparent text-white focus:outline-none font-mono placeholder:text-slate-600 text-xs sm:text-sm"
+            autocomplete="off"
+          />
+          <button type="submit" class="px-3 py-1 rounded bg-universe-cyan/20 text-universe-cyan border border-universe-cyan/40 text-xs font-mono hover:bg-universe-cyan/30">
+            Run
+          </button>
+        </form>
+
+        <!-- Command Shortcuts -->
+        <div class="px-4 py-2.5 bg-black/90 border-t border-white/5 flex flex-wrap gap-2 text-[11px] font-mono text-slate-400">
+          <span class="self-center text-slate-500">Quick run:</span>
+          <button onclick="runCommand('whoami')" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 hover:text-universe-cyan transition-colors">whoami</button>
+          <button onclick="runCommand('fetch_research')" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 hover:text-universe-cyan transition-colors">fetch_research</button>
+          <button onclick="runCommand('cite ariastro')" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 hover:text-universe-cyan transition-colors">cite ariastro</button>
+          <button onclick="runCommand('cite exoetc')" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 hover:text-universe-cyan transition-colors">cite exoetc</button>
+          <button onclick="runCommand('status')" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 hover:text-universe-cyan transition-colors">status</button>
+          <button onclick="runCommand('clear')" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-rose-400 hover:text-rose-300 transition-colors">clear</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // RESEARCH PAPERS DATABASE FOR ABSTRACTS & CITATIONS
+    const PAPERS_DB = {
+      ariastro: {
+        id: "ariastro",
+        category: "OBSERVATIONAL ASTROPHYSICS",
+        target: "HBCSE (TIFR) / NIUS ASTRONOMY",
+        title: "Decadal Near-Infrared Photometry and Slope Image Reduction for Eruptive Pre-Main-Sequence Stars",
+        authors: "Maddy Prasad, Collaborators & NIUS Astro Working Group",
+        abstract: "We present high-precision multi-epoch near-infrared (J, H, K band) photometric analysis of eruptive young stellar objects (YSOs), focusing on FU Orionis and EX Lupi-type prototypes. Utilizing the newly developed AriAstroTools pipeline, we construct an end-to-end reduction sequence that calculates non-destructive pixel ramp slope images, corrects for non-linear detector saturations, and computes differential aperture flux. We report long-term accretion disc structural transitions, episodic mass accretion bursts, and infrared color-color evolutionary vectors.",
+        bibtex: `@article{prasad2026ariastro,
+  title   = {Decadal Near-Infrared Photometry and Slope Image Reduction for Eruptive Pre-Main-Sequence Stars},
+  author  = {Prasad, Maddy and {NIUS Working Group}},
+  journal = {Publications of the Astronomical Society & Technical Reports},
+  year    = {2026},
+  volume  = {14},
+  pages   = {112--128},
+  doi     = {10.48550/arXiv.astro-ph.2026.0401}
+}`,
+        apa: `Prasad, M., & NIUS Working Group. (2026). Decadal Near-Infrared Photometry and Slope Image Reduction for Eruptive Pre-Main-Sequence Stars. Publications of the Astronomical Society & Technical Reports, 14, 112–128. https://doi.org/10.48550/arXiv.astro-ph.2026.0401`
+      },
+      exoetc: {
+        id: "exoetc",
+        category: "SPACE MISSIONS & SIMULATION",
+        target: "EXOPLANET TRANSMISSION SPECTROSCOPY",
+        title: "ExoETC: Photon-Noise and Exposure Time Calculator for Space-Borne Transit Spectroscopy",
+        authors: "Maddy Prasad, Computational Astrophysics Lab",
+        abstract: "Transmission spectroscopy demands stringent optical noise budgeting to isolate spectral features in exoplanetary atmospheres. ExoETC (ExoPy) delivers a deterministic radiometric engine to simulate stellar irradiance, throughput attenuation, detector quantum efficiency, and readout noise floors. We benchmark ExoETC against standard benchmarks, demonstrating accuracy within 1.4% of observed photon statistics for transit SNR thresholds.",
+        bibtex: `@software{prasad2025exoetc,
+  author    = {Prasad, Maddy},
+  title     = {ExoETC: High-Precision Exposure Time and Noise Budget Calculator for Exoplanet Transmission Missions},
+  year      = {2025},
+  publisher = {GitHub},
+  version   = {v2.1.0},
+  url       = {https://github.com/maddy/exoetc}
+}`,
+        apa: `Prasad, M. (2025). ExoETC: High-Precision Exposure Time and Noise Budget Calculator for Exoplanet Transmission Missions (Version 2.1.0) [Computer software]. GitHub. https://github.com/maddy/exoetc`
+      },
+      cosmicpaper: {
+        id: "cosmicpaper",
+        category: "SOFTWARE & SYSTEMS",
+        target: "DESKTOP ARX-IV ENGINE",
+        title: "CosmicPaper: Native Offline-First Synthesizer for arXiv Astrophysics Preprints",
+        authors: "Maddy Prasad",
+        abstract: "The acceleration of daily astro-ph submissions creates substantial synthesis latency for observational researchers. CosmicPaper is an open-source desktop workstation designed with Python and Qt. It features an automated scraper and tokenized local search index that ranks preprints by target instrumentation, wavelength passband, and coordinate targets with instantaneous LaTeX previewing.",
+        bibtex: `@software{prasad2025cosmicpaper,
+  author    = {Prasad, Maddy},
+  title     = {CosmicPaper: Native Desktop Client and Filter Engine for Astrophysics arXiv Preprints},
+  year      = {2025},
+  publisher = {Open Source Software},
+  url       = {https://github.com/maddy/cosmicpaper}
+}`,
+        apa: `Prasad, M. (2025). CosmicPaper: Native Desktop Client and Filter Engine for Astrophysics arXiv Preprints [Computer software]. GitHub. https://github.com/maddy/cosmicpaper`
+      },
+      csaprm: {
+        id: "csaprm",
+        category: "MACHINE LEARNING",
+        target: "RECOMMENDER ARCHITECTURES",
+        title: "CS-APRM: Mitigating High-Dimensional Sparsity via Anti-Promotional Cold-Start Optimization",
+        authors: "Maddy Prasad",
+        abstract: "Cold-start challenges in recommender networks are compounded by popularity bias, where established items crowd out latent candidates. We formulate CS-APRM (Cold-Start Anti-Promotional Recommendation Model), integrating an orthogonal projection penalty and dense semantic latent embeddings. Empirical evaluation confirms a 23.4% lift in long-tail candidate discoverability while preserving ranking NDCG.",
+        bibtex: `@article{prasad2024csaprm,
+  title   = {CS-APRM: Mitigating High-Dimensional Sparsity via Anti-Promotional Cold-Start Optimization},
+  author  = {Prasad, Maddy},
+  journal = {Computational Intelligence & Algorithmic Modeling},
+  year    = {2024},
+  volume  = {8},
+  number  = {3},
+  pages   = {45--57}
+}`,
+        apa: `Prasad, M. (2024). CS-APRM: Mitigating High-Dimensional Sparsity via Anti-Promotional Cold-Start Optimization. Computational Intelligence & Algorithmic Modeling, 8(3), 45–57.`
+      },
+      hi21cm: {
+        id: "hi21cm",
+        category: "RADIO ASTRONOMY",
+        target: "GAURIBIDANUR ARRAY / RRI",
+        title: "Kinematics of Neutral Galactic Hydrogen (HI) and Dark Matter Dispersion from 21cm Profiles",
+        authors: "Maddy Prasad & Observational Radio Internship Team",
+        abstract: "Using raw spectroscopic data collected across low-frequency radio arrays at the Gauribidanur Observatory, we isolated the 1420.405 MHz hyperfine transition of neutral hydrogen. Through Doppler velocity uncurrying across galactic quadrants, we generated rotation curves that reveal flat outer galactic velocity distributions, validating dark matter halo density profiles.",
+        bibtex: `@techreport{prasad2024galactic21cm,
+  title       = {Kinematics of Neutral Galactic Hydrogen (HI) and Dark Matter Dispersion from 21cm Profiles},
+  author      = {Prasad, Maddy},
+  institution = {Raman Research Institute / Gauribidanur Radio Observatory},
+  year        = {2024},
+  type        = {Research Technical Report},
+  number      = {RRI-TR-2024-09}
+}`,
+        apa: `Prasad, M. (2024). Kinematics of Neutral Galactic Hydrogen (HI) and Dark Matter Dispersion from 21cm Profiles (Research Technical Report No. RRI-TR-2024-09). Raman Research Institute / Gauribidanur Radio Observatory.`
+      }
+    };
+
+    let activePaperKey = "ariastro";
+    let activeCitationFormat = "bibtex";
+
+    // MODAL OPEN / CLOSE LOGIC
+    const paperModal = document.getElementById('paperModal');
+    const modalBox = document.getElementById('modalBox');
+
+    function openPaperModal(paperKey) {
+      const data = PAPERS_DB[paperKey];
+      if (!data) return;
+
+      activePaperKey = paperKey;
+      document.getElementById('modalCategory').innerText = data.category;
+      document.getElementById('modalTarget').innerText = data.target;
+      document.getElementById('modalPaperId').innerText = `id: ${data.id}`;
+      document.getElementById('modalTitle').innerText = data.title;
+      document.getElementById('modalAuthors').querySelector('span').innerText = data.authors;
+      document.getElementById('modalAbstract').innerText = data.abstract;
+
+      switchCitationTab(activeCitationFormat);
+
+      paperModal.classList.remove('opacity-0', 'pointer-events-none');
+      modalBox.classList.remove('scale-95');
+      modalBox.classList.add('scale-100');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closePaperModal() {
+      modalBox.classList.remove('scale-100');
+      modalBox.classList.add('scale-95');
+      paperModal.classList.add('opacity-0', 'pointer-events-none');
+      document.body.style.overflow = 'auto';
+    }
+
+    paperModal.addEventListener('click', (e) => {
+      if (e.target === paperModal) {
+        closePaperModal();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePaperModal();
+      }
+    });
+
+    // CITATION TAB SWITCHING & COPYING
+    function switchCitationTab(format) {
+      activeCitationFormat = format;
+      const data = PAPERS_DB[activePaperKey];
+      const box = document.getElementById('citationBox');
+      const tabBib = document.getElementById('tabBibtex');
+      const tabApa = document.getElementById('tabApa');
+
+      if (format === 'bibtex') {
+        box.innerText = data.bibtex;
+        tabBib.className = 'px-2.5 py-1 rounded font-semibold bg-universe-cyan text-black transition-all';
+        tabApa.className = 'px-2.5 py-1 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+      } else {
+        box.innerText = data.apa;
+        tabApa.className = 'px-2.5 py-1 rounded font-semibold bg-universe-cyan text-black transition-all';
+        tabBib.className = 'px-2.5 py-1 rounded text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+      }
+    }
+
+    function copyActiveCitation() {
+      const data = PAPERS_DB[activePaperKey];
+      const textToCopy = activeCitationFormat === 'bibtex' ? data.bibtex : data.apa;
+      
+      const tempInput = document.createElement('textarea');
+      tempInput.value = textToCopy;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      const copyBtn = document.getElementById('copyCitationBtn');
+      const originalHtml = copyBtn.innerHTML;
+      copyBtn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Copied!</span>`;
+      lucide.createIcons();
+      showToast(`Copied ${activeCitationFormat.toUpperCase()} citation!`);
+
+      setTimeout(() => {
+        copyBtn.innerHTML = originalHtml;
+        lucide.createIcons();
+      }, 2000);
+    }
+
+    function downloadBibtexFile() {
+      const data = PAPERS_DB[activePaperKey];
+      const blob = new Blob([data.bibtex], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${data.id}_citation.bib`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast(`Downloaded ${data.id}_citation.bib`);
+    }
+
+    // THEME ENGINE
+    const htmlElem = document.documentElement;
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+    const bgGrid = document.getElementById('bgGrid');
+
+    function applyTheme(isDark) {
+      if (isDark) {
+        htmlElem.classList.add('dark');
+        htmlElem.classList.remove('light');
+        bgGrid.className = 'fixed inset-0 pointer-events-none bg-grid-dark z-0 transition-opacity duration-500';
+        sunIcon.classList.add('hidden');
+        moonIcon.classList.remove('hidden');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        htmlElem.classList.remove('dark');
+        htmlElem.classList.add('light');
+        bgGrid.className = 'fixed inset-0 pointer-events-none bg-grid-light z-0 transition-opacity duration-500';
+        moonIcon.classList.add('hidden');
+        sunIcon.classList.remove('hidden');
+        localStorage.setItem('theme', 'light');
+      }
+      lucide.createIcons();
+    }
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      applyTheme(false);
+    } else {
+      applyTheme(true);
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const isCurrentlyDark = htmlElem.classList.contains('dark');
+      applyTheme(!isCurrentlyDark);
+      showToast(!isCurrentlyDark ? 'Switched to Dark Mode' : 'Switched to Light Mode');
+    });
+
+    // MOBILE MENU TOGGLE
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // TOAST NOTIFICATION UTILITY
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    let toastTimeout;
+
+    function showToast(message) {
+      clearTimeout(toastTimeout);
+      toastMsg.innerText = message;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3000);
+    }
+
+    // CLIPBOARD HELPER
+    function copyEmailToClipboard() {
+      const email = 'maddy.research@example.edu';
+      const tempInput = document.createElement('input');
+      tempInput.value = email;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast('Email copied to clipboard: ' + email);
+      } catch (err) {
+        showToast('Contact: maddy.research@example.edu');
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    // BENTO GRID PROJECT FILTERING
+    function filterProjects(category) {
+      const cards = document.querySelectorAll('.project-card');
+      const buttons = document.querySelectorAll('.filter-btn');
+
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-universe-cyan', 'text-black', 'font-semibold');
+        btn.classList.add('text-slate-700', 'dark:text-slate-300');
+      });
+
+      event.target.classList.add('bg-universe-cyan', 'text-black', 'font-semibold');
+      event.target.classList.remove('text-slate-700', 'dark:text-slate-300');
+
+      cards.forEach(card => {
+        if (category === 'all' || card.getAttribute('data-category') === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // INTERACTIVE TERMINAL ENGINE
+    const terminalOutput = document.getElementById('terminalOutput');
+    const terminalInput = document.getElementById('terminalInput');
+
+    const COMMANDS = {
+      whoami: "Maddy Prasad — Undergraduate researcher in Observational Astronomy & Astrophysics. NIUS Astronomy Fellow at HBCSE (TIFR).",
+      fetch_research: "Active Projects:\n• AriAstroTools (id: ariastro): NIR reduction & slope image pipeline for FUor/EXor stars\n• ExoETC (id: exoetc): Exposure time calculator for transmission spectroscopy\n• CosmicPaper (id: cosmicpaper): Native arXiv desktop reader\n• CS-APRM (id: csaprm): Cold-start recommender ML model\n• Galactic HI (id: hi21cm): 21cm Radio Astronomy Doppler kinematics\n\nTip: Run 'cite <paper_id>' to open citation & abstract modal.",
+      status: "CURRENT STATUS: Active NIUS Research fellow. Exploring open-source astro computation pipelines.",
+      stack: "CORE STACK: Python 3.12, Astropy, SciPy, Lightkurve, C++, PyQt6, Git, Unix, LaTeX.",
+      contact: "Direct Email: maddy.research@example.edu | GitHub: github.com",
+      help: "Available commands:\n• whoami             - Brief overview\n• fetch_research     - Summary of active research artifacts\n• cite <paper_id>    - Open abstract and citation modal (e.g. 'cite ariastro')\n• status             - Current academic & research status\n• stack              - Technical languages and packages\n• contact            - Retrieve contact details\n• clear              - Flush terminal log"
+    };
+
+    function appendTerminal(cmdText, isInput = false, isError = false) {
+      const row = document.createElement('div');
+      if (isInput) {
+        row.innerHTML = `<span class="text-universe-cyan font-bold">&gt; </span><span class="text-white">${cmdText}</span>`;
+      } else if (isError) {
+        row.innerHTML = `<span class="text-rose-400">${cmdText}</span>`;
+      } else {
+        row.className = "text-slate-300 whitespace-pre-line";
+        row.innerText = cmdText;
+      }
+      terminalOutput.appendChild(row);
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    function runCommand(commandString) {
+      const cleanCmd = commandString.trim();
+      const lowerCmd = cleanCmd.toLowerCase();
+      appendTerminal(commandString, true);
+
+      if (lowerCmd === 'clear') {
+        terminalOutput.innerHTML = '';
+        return;
+      }
+
+      if (lowerCmd.startsWith('cite ')) {
+        const paperId = lowerCmd.replace('cite ', '').trim();
+        if (PAPERS_DB[paperId]) {
+          appendTerminal(`Launching modal for: "${PAPERS_DB[paperId].title}"`);
+          openPaperModal(paperId);
+          return;
+        } else {
+          appendTerminal(`Error: Paper with ID '${paperId}' not found. Valid IDs: ariastro, exoetc, cosmicpaper, csaprm, hi21cm`, false, true);
+          return;
+        }
+      }
+
+      if (COMMANDS[lowerCmd]) {
+        appendTerminal(COMMANDS[lowerCmd]);
+      } else {
+        appendTerminal(`command not found: "${commandString}". Type "help" for a list of available routines.`, false, true);
+      }
+    }
+
+    function handleTerminalSubmit(event) {
+      event.preventDefault();
+      const val = terminalInput.value.trim();
+      if (!val) return;
+      runCommand(val);
+      terminalInput.value = '';
+    }
+  </script>
+</body>
+</html>
